@@ -6,9 +6,15 @@ import com.github.sakserv.minicluster.impl.HiveLocalServer2;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 
+import java.util.logging.Logger;
+
 public class MiniCluster {
-    public void hdfsMinicluster() throws Exception {
-        HdfsLocalCluster hdfsLocalCluster = new HdfsLocalCluster.Builder()
+    private final static Logger logger = Logger.getLogger(MiniCluster.class.getSimpleName());
+
+    private static void hdfsMinicluster() throws Exception {
+        logger.info("Start HDFS server");
+
+        new HdfsLocalCluster.Builder()
                 .setHdfsNamenodePort(8020)
                 .setHdfsNamenodeHttpPort(50070)
                 .setHdfsTempDir("embedded_hdfs")
@@ -17,23 +23,26 @@ public class MiniCluster {
                 .setHdfsFormat(true)
                 .setHdfsEnableRunningUserAsProxyUser(true)
                 .setHdfsConfig(new Configuration())
-                .build();
-
-        hdfsLocalCluster.start();
+                .build()
+                .start();
     }
 
-    public static void hiveServer2MiniCluster() throws Exception {
-        HiveLocalMetaStore hiveLocalMetaStore = new HiveLocalMetaStore.Builder()
+    private static void hiveServerMiniCluster() throws Exception {
+        logger.info("Start Hive server");
+
+        new HiveLocalMetaStore.Builder()
                 .setHiveMetastoreHostname("localhost")
                 .setHiveMetastorePort(9083)
                 .setHiveMetastoreDerbyDbDir("metastore_db")
                 .setHiveScratchDir("hive_scratch_dir")
                 .setHiveWarehouseDir("warehouse_dir")
                 .setHiveConf(new HiveConf())
-                .build();
-        hiveLocalMetaStore.start();
+                .build()
+                .start();
 
-        HiveLocalServer2 hiveLocalServer2 = new HiveLocalServer2.Builder()
+        logger.info("Start Hive2 server");
+
+        new HiveLocalServer2.Builder()
                 .setHiveServer2Hostname("localhost")
                 .setHiveServer2Port(10000)
                 .setHiveMetastoreHostname("localhost")
@@ -43,14 +52,21 @@ public class MiniCluster {
                 .setHiveWarehouseDir("warehouse_dir")
                 .setHiveConf(new HiveConf())
                 .setZookeeperConnectionString("localhost:12345")
-                .build();
-
-        hiveLocalServer2.start();
+                .build()
+                .start();
     }
 
     public static void main(String[] args) {
         try {
-            hiveServer2MiniCluster();
+            if (args.length > 0) {
+                if (args[0].equals("hdfs")) {
+                    hdfsMinicluster();
+                } else if (args[0].equals("hive")) {
+                    hiveServerMiniCluster();
+                }
+            } else {
+                System.out.println("Please choose an argument: hdfs or hive");
+            }
         } catch (Exception e) {
             System.out.println("Error while starting: " + e);
         }
