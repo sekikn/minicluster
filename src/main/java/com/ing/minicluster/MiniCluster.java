@@ -3,6 +3,7 @@ package com.ing.minicluster;
 import com.github.sakserv.minicluster.impl.HdfsLocalCluster;
 import com.github.sakserv.minicluster.impl.HiveLocalMetaStore;
 import com.github.sakserv.minicluster.impl.HiveLocalServer2;
+import com.github.sakserv.minicluster.impl.ZookeeperLocalCluster;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 
@@ -10,6 +11,17 @@ import java.util.logging.Logger;
 
 public class MiniCluster {
     private final static Logger logger = Logger.getLogger(MiniCluster.class.getSimpleName());
+
+    private static void zookeeperMinicluster() throws Exception {
+        logger.info("Start Zookeeper server");
+
+        new ZookeeperLocalCluster.Builder()
+                .setPort(2181)
+                .setTempDir("embedded_zookeeper")
+                .setZookeeperConnectionString("localhost:2181")
+                .build()
+                .start();
+    }
 
     private static void hdfsMinicluster() throws Exception {
         logger.info("Start HDFS server");
@@ -59,13 +71,18 @@ public class MiniCluster {
     public static void main(String[] args) {
         try {
             if (args.length > 0) {
-                if (args[0].equals("hdfs")) {
+                if (args[0].equals("zookeeper")) {
+                    zookeeperMinicluster();
+                } else if (args[0].equals("hdfs")) {
                     hdfsMinicluster();
                 } else if (args[0].equals("hive")) {
                     hiveServerMiniCluster();
                 }
             } else {
-                System.out.println("Please choose an argument: hdfs or hive");
+                logger.info("Start all servers");
+                zookeeperMinicluster();
+                hdfsMinicluster();
+                hiveServerMiniCluster();
             }
         } catch (Exception e) {
             System.out.println("Error while starting: " + e);

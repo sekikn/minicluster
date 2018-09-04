@@ -11,7 +11,7 @@ RUN mvn package
 
 FROM openjdk:8-jre
 
-EXPOSE 10000 9083 8020 50700
+EXPOSE 10000 9083 8020 50700 2181
 
 COPY --from=0 /app/target/minicluster-1.0-SNAPSHOT-bin.tar.gz .
 
