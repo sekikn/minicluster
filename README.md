@@ -7,7 +7,7 @@ An application to run a minicluster of HDFS, Hive or Hive2 for testing purposes.
 Simply build the docker container using
 
 ```bash
-build --no-cache -t minicluster .
+docker build --no-cache -t minicluster .
 ```
 
 For a Hive cluster, run:
@@ -20,4 +20,10 @@ For a HDFS cluster, run:
 
 ```bash
 docker run minicluster hdfs
+```
+
+To start all services, simply run:
+
+```bash
+docker run minicluster
 ```

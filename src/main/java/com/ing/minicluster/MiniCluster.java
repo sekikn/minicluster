@@ -28,7 +28,7 @@ public class MiniCluster {
     }
 
     private static void hiveServerMiniCluster() throws Exception {
-        logger.info("Start Hive server");
+        logger.info("Start HiveMetaStore server");
 
         new HiveLocalMetaStore.Builder()
                 .setHiveMetastoreHostname("localhost")
@@ -40,7 +40,7 @@ public class MiniCluster {
                 .build()
                 .start();
 
-        logger.info("Start Hive2 server");
+        logger.info("Start HiveServer2 server");
 
         new HiveLocalServer2.Builder()
                 .setHiveServer2Hostname("localhost")
@@ -65,7 +65,8 @@ public class MiniCluster {
                     hiveServerMiniCluster();
                 }
             } else {
-                System.out.println("Please choose an argument: hdfs or hive");
+                hdfsMinicluster();
+                hiveServerMiniCluster();
             }
         } catch (Exception e) {
             System.out.println("Error while starting: " + e);
